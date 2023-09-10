@@ -1,34 +1,38 @@
-import React, { useEffect  } from "react";
+import React, { useEffect , useState  } from "react";
 import { useDispatch } from "react-redux";
 import { closeMenu } from "../utils/appSlice";
 import { useSearchParams } from "react-router-dom";
 import CommentsContainer from "./CommentsContainer";
 import LiveChat from "./LiveChat";
 import VideoInfo from './VideoInfo';
+import { YOUTUBE_VIDEO_BYID } from "../utils/constants";
+import { BiLike } from 'react-icons/bi'
+import { BiDislike } from 'react-icons/bi'
+import { PiShareFatLight } from 'react-icons/pi'
+import { LiaDownloadSolid } from 'react-icons/lia'
 
 const WatchPage = () => {
 
   const dispatch = useDispatch();
 
-  //videoInfo
 
   const [searchParam] = useSearchParams();
-  // const videoId = searchParam.get("v");
-  // console.log(videoId);
+  
 
-  // const [info,setInfo]=useState([])
+  const videoDetails = YOUTUBE_VIDEO_BYID + searchParam.get("v");
 
-    // useEffect(()=>{
-    //     getVideoInfo();
-    // } , [])
+  const [videoInfo, setVideoInfo] = useState([]);
+  const [subscribe,setSubscribe]=useState("Subscribe")
 
-    // const getVideoInfo=async ()=>{
-    //     const data = await fetch('https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=50&regionCode=IN&key=AIzaSyA7JvSI_GOHUZeXA551WRcH0UfLNwgb0hk');
-    //     const json=await data.json();
-    //     setInfo(json.items)
-    // }
-
-  // console.log(searchParam.get('v'))
+  useEffect(() => {
+    const getVideoInfo = async () => {
+      const data = await fetch(videoDetails);
+      const json = await data.json();
+      console.log(json.items);
+      setVideoInfo(json.items);
+    };
+    getVideoInfo();
+  }, []);
 
   useEffect(() => {
     dispatch(closeMenu());
@@ -50,18 +54,70 @@ const WatchPage = () => {
             ></iframe>
           </div>
 
-          {/* <div className="w-[1100px] rounded-lg shadow-lg p-2 mt-3">
-            {info.map((info) => {
-              return (
-                <div key={info.id} >
-                  <h1 >{videoId && info?.snippet?.title}</h1>
-                  {
-                    (videoId===info.id) ?console.log("hello") : console.log("no")
-                  }
-                </div>
-              );
-            })}
-          </div> */}
+          <div>
+            {
+              videoInfo.map((video)=>{
+                return(
+                  <>
+                    <div key={video.id} >
+                      <h1 className="font-bold text-xl m-2 p-1" >{video?.snippet?.title}</h1>
+
+                      <div className="flex justify-between" >
+                        <div className="flex " >
+                          <div className="p-2 m-2 border border-gray-200 w-[200px] rounded-lg flex " > 
+                            <img className="w-[60px] rounded-full" src={video?.snippet?.thumbnails?.default?.url} alt="img" /> 
+                            <h1 className="m-2" > {video?.snippet?.channelTitle}</h1>
+                          </div>
+
+                           <div className="p-2 mt-3 ml-14 border border-gray-200 rounded-full" >
+                            <button className="mt-2" onClick={()=>{
+                              setSubscribe("Subscribed")
+                            }} > {subscribe} </button>
+                          </div>
+                        </div>
+
+                        <div className="flex" >
+                          <button className="flex rounded-full border border-gray-200 items-center mr-6 p-2 shadow-md" >
+                            <div className="flex items-center m-2" >
+                              <BiLike  /> <h1 className="ml-2" >{video?.statistics?.likeCount}</h1> 
+                            </div>
+
+                            <div>
+                              <BiDislike />
+                            </div>
+                          </button>
+
+                          <button className="flex items-center mr-6 border border-gray-200 p-2 rounded-full shadow-md" >
+                            <PiShareFatLight /> 
+                            <h1>Share</h1>
+                          </button>
+
+                          <button className="flex items-center border border-gray-200 p-2 rounded-full shadow-md" >
+                            <LiaDownloadSolid />
+                            <h1>Download</h1>
+                          </button>
+
+                        </div>
+
+                
+
+                      </div>
+
+                        <p className="font-bold">
+                             {video?.statistics?.viewCount} Views 😎{" "}
+                             {video?.snippet?.publishedAt} 
+                      </p>
+
+                    </div>
+                  
+                  
+                  </>
+                )
+              })
+            }
+          </div>
+
+          
         </div>
 
         <div className="w-full">
