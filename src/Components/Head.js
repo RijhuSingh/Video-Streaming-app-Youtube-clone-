@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
 import { YOUTUBE_SEARCH_API } from "../utils/constants";
 import { cacheResults } from "../utils/searchSlice";
+import { Navigate } from "react-router-dom";
 
 const Head = () => {
 
@@ -11,6 +12,7 @@ const Head = () => {
   const [searchQuery,setSearchQuery]=useState("");
   const [suggestions,setSuggestions]=useState([]);
   const [showSuggestion,setShowSuggestion]=useState(false);
+  const [keyword,setKeyword]=useState("");
 
   const searchCache=useSelector(store=>store.search);
 
@@ -66,7 +68,7 @@ const Head = () => {
       </div>
 
       <div className="col-span-10 text-center">
-        <div>
+        <form >
           <input
             className="w-1/2 p-2 border border-gray-600 rounded-l-full px-5"
             type="text"
@@ -78,7 +80,7 @@ const Head = () => {
           <button className="p-2 border border-gray-400 bg-gray-300 rounded-r-full">
             Search
           </button>
-        </div>
+        </form>
 
        {showSuggestion && 
          <div className="absolute bg-white py-2 px-5 ml-64 w-[36rem] rounded-lg shadow-lg" >

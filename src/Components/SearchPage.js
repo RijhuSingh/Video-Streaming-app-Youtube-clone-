@@ -1,43 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useSearchParams } from 'react-router-dom';
+import SearchCard from './SearchCard';
 
 const SearchPage = () => {
 
-    const [searchedVideos , setSearchedVideos]=useState([]);
-    const [searchStr , setSearchStr] = useState('');
+  let [searchParams] = useSearchParams();
+  const query = searchParams.get("search_query")
+  // console.log(query)
 
-    const [searchParams]=useSearchParams();
+  const [searchVideos,setSearchVideos] = useState([]);
+  useEffect(()=>{
+    const  getSearchResults = async()=>{
+        const res =  await fetch(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${query}&key=AIzaSyA7JvSI_GOHUZeXA551WRcH0UfLNwgb0hk`)
+        const json = await res.json()
+        console.log(json.items)
+        setSearchVideos(json.items)
+       
+      }
+   getSearchResults()
+  },[query])
 
-// const searchStr = searchParams.get("s");
-
-
-    useEffect(()=>{
-    setSearchStr(searchParams.get("s"));
-    } , [searchParams])
-
-    useEffect(()=>{
-    getSearchResults();
-    } , [searchStr])
-
-    const getSearchResults = async()=>{
-        const data = await fetch(`${SEARCH_RESULTS_API}${searchStr}`);
-        const json = await data.json();
-        // console.log(json.items);
-        setSearchedVideos(json.items);
-
-    } 
-
-
-  return (
-    !searchedVideos? <h1>Loading</h1> :
-    <div className=' w-full m-2'>
-        {
-          searchedVideos.map((searchedVideo , index)=>{
-            return (
-              <Link  key = {index}  to={"watch?v="+searchedVideo?.id?.videoId}><SearchCard data = {searchedVideo}/></Link>
-              )
-          })
-        }
+  return (!videos)?<div>searching</div>: (
+    <div>
+      {videos.map((video)=>{
+        return  (video.id.kind==="youtube#video")? <Link to={'/watch?v='+video.id.videoId} key={ video.id.videoId}>  < SearchCard thumbnail={video.snippet.thumbnails.medium} title={video.snippet.title} channelTitle={video.snippet.channelTitle} desc={video.snippet.description} /> </Link>:""
+      })} 
     </div>
   )
 }

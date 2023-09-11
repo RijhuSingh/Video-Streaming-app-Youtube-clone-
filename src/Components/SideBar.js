@@ -1,6 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom';
+import {AiOutlineHome} from 'react-icons/ai'
 
 const SideBar = () => {
 
@@ -11,10 +12,12 @@ const SideBar = () => {
   return (
     <div className='w-48 shadow-lg' >
       <ul className='my-4' >
-        <li className='font-bold text-center my-2 p-2 hover:bg-gray-200  rounded-full cursor-pointer' >
-          <Link to='/' >Home</Link>
+        <li className='font-bold text-center  p-2 hover:bg-gray-200  rounded-full cursor-pointer' >
+          <Link to='/' className='items-center flex px-3' > <p className='mx-2' > <AiOutlineHome /> </p>
+            <p> Home</p>
+           </Link>
         </li>
-        <li className='font-bold text-center my-2 p-2 hover:bg-gray-200  rounded-full cursor-pointer' >Shorts</li>
+        <li className='font-bold text-center my-2 p-2 hover:bg-gray-200  rounded-full cursor-pointer' > Shorts</li>
         <li className='font-bold text-center my-2 p-2 hover:bg-gray-200  rounded-full cursor-pointer' >Subscriptions</li>
       </ul>
 

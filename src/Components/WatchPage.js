@@ -1,15 +1,15 @@
 import React, { useEffect , useState  } from "react";
 import { useDispatch } from "react-redux";
 import { closeMenu } from "../utils/appSlice";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import CommentsContainer from "./CommentsContainer";
 import LiveChat from "./LiveChat";
-import VideoInfo from './VideoInfo';
-import { YOUTUBE_VIDEO_BYID } from "../utils/constants";
+import { YOUTUBE_VIDEO_API, YOUTUBE_VIDEO_BYID } from "../utils/constants";
 import { BiLike } from 'react-icons/bi'
 import { BiDislike } from 'react-icons/bi'
 import { PiShareFatLight } from 'react-icons/pi'
 import { LiaDownloadSolid } from 'react-icons/lia'
+import ShimmerWatchPage from "./ShimmerWatchPage";
 
 const WatchPage = () => {
 
@@ -38,7 +38,19 @@ const WatchPage = () => {
     dispatch(closeMenu());
   }, []);
 
-  return (
+  const [suggestionVideo, setSuggestionVideo] = useState([]);
+
+  useEffect(() => {
+    const getSubscriber = async () => {
+      const data = await fetch(YOUTUBE_VIDEO_API);
+      const json = await data.json();
+      console.log(json);
+      setSuggestionVideo(json.items);
+    };
+    getSubscriber();
+  }, []);
+
+  return videoInfo?.length===0 ? <ShimmerWatchPage /> : (
     <div className="w-full">
       <div className="px-5 w-full flex">
         <div className="flex flex-col">
@@ -77,7 +89,7 @@ const WatchPage = () => {
                         </div>
 
                         <div className="flex" >
-                          <button className="flex rounded-full border border-gray-200 items-center mr-6 p-2 shadow-md" >
+                          <button className="flex rounded-full border border-gray-200 items-center mr-6 px-2 shadow-md" >
                             <div className="flex items-center m-2" >
                               <BiLike  /> <h1 className="ml-2" >{video?.statistics?.likeCount}</h1> 
                             </div>
@@ -87,12 +99,12 @@ const WatchPage = () => {
                             </div>
                           </button>
 
-                          <button className="flex items-center mr-6 border border-gray-200 p-2 rounded-full shadow-md" >
+                          <button className="flex items-center mr-6 border border-gray-200 px-2 rounded-full shadow-md" >
                             <PiShareFatLight /> 
                             <h1>Share</h1>
                           </button>
 
-                          <button className="flex items-center border border-gray-200 p-2 rounded-full shadow-md" >
+                          <button className="flex items-center border border-gray-200 px-2 rounded-full shadow-md" >
                             <LiaDownloadSolid />
                             <h1>Download</h1>
                           </button>
@@ -116,16 +128,46 @@ const WatchPage = () => {
               })
             }
           </div>
+          <CommentsContainer />
 
           
         </div>
 
-        <div className="w-full">
-          <LiveChat />
+        <div className="w-full overflow-hidden" >
+          <div >
+            <LiveChat />
+          </div>
+
+          <div>
+          {suggestionVideo.map((info) => {
+            return (
+              <>
+                <Link to={"?v=" + info.id} key={info.id}>
+                  <div className="p-2 w-[28rem] flex hover:bg-gray-200 rounded-md">
+                    <img
+                      className="rounded-xl"
+                      src={info?.snippet?.thumbnails?.default?.url}
+                      alt="thumails"
+                    />
+                    <ul className="ml-2">
+                      <li className="font-bold text-sm text-gray w-[28rem] text-ellipsis overflow-hidden "> 
+                        {info?.snippet?.title}
+                      </li>
+                      <li className="text-sm">{info?.snippet?.channelTitle}</li>
+                      <li className="text-sm">
+                        {info?.statistics?.viewCount} Views
+                      </li>
+                    </ul>
+                  </div>
+                </Link>
+              </>
+            );
+          })}
+          </div>
         </div>
+
+       
       </div>
-      <CommentsContainer />
-      <VideoInfo />
     </div>
 
   );
